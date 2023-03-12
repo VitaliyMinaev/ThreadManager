@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace ThreadManager.Domain;
 
@@ -7,6 +9,7 @@ public class ConsoleWriter
     private string _name;
     private System.Timers.Timer _timer;
     private Thread _currentThread;
+    private Stopwatch _stopwatch;
     public ConsoleWriter(string name, int timerIntervalInMilliseconds)
     {
         _name = name;
@@ -17,6 +20,7 @@ public class ConsoleWriter
         _timer.Elapsed += onIntervalElapsed;
 
         _currentThread = null;
+        _stopwatch = new Stopwatch();
     }
     
     public void Start(object? o)
@@ -35,6 +39,7 @@ public class ConsoleWriter
         }
         
         _timer.Start();
+        _stopwatch.Start();
         for (int i = 1; i <= iterationMaxValue; i++)
         {
             Console.WriteLine($"Name: {_name}; State: {i}");
@@ -49,10 +54,12 @@ public class ConsoleWriter
     {
         if (_currentThread == null)
             throw new NullReferenceException($"{_currentThread} can not contain null");
-        
+
+        var ts = _stopwatch.Elapsed;
         var th  = _currentThread;
-        
+
         Console.WriteLine("\n\n");
+        Console.WriteLine($"Execution time: {ts.Seconds}");
         Console.WriteLine($"Thread name: {th.Name}");
         Console.WriteLine("Managed thread #{0}: ", th.ManagedThreadId);
         Console.WriteLine("Background thread: {0}", th.IsBackground);
